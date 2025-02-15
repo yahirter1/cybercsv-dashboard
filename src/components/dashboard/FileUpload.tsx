@@ -5,6 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
+interface LogEntry {
+  timestamp: string;
+  type: string;
+  source: string;
+  message: string;
+  severity: string;
+}
+
 const FileUpload = () => {
   const { toast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
@@ -32,7 +40,24 @@ const FileUpload = () => {
     }
   };
 
-  const handleFiles = (files: File[]) => {
+  const parseCSV = async (file: File): Promise<LogEntry[]> => {
+    const text = await file.text();
+    const lines = text.split('\n');
+    const headers = lines[0].split(',').map(header => header.trim());
+    
+    return lines.slice(1).map(line => {
+      const values = line.split(',').map(value => value.trim());
+      return {
+        timestamp: values[0] || '',
+        type: values[1] || '',
+        source: values[2] || '',
+        message: values[3] || '',
+        severity: values[4] || ''
+      };
+    }).filter(entry => entry.timestamp); // Filtrar líneas vacías
+  };
+
+  const handleFiles = async (files: File[]) => {
     const csvFiles = files.filter(file => file.type === "text/csv");
     
     if (csvFiles.length === 0) {
@@ -44,11 +69,24 @@ const FileUpload = () => {
       return;
     }
 
-    // Aquí puedes procesar el archivo CSV
-    toast({
-      title: "Archivo cargado",
-      description: `Se cargó el archivo: ${csvFiles[0].name}`,
-    });
+    try {
+      const logs = await parseCSV(csvFiles[0]);
+      console.log("Logs procesados:", logs);
+      
+      // Aquí actualizaríamos el estado global con los logs
+      // Por ahora solo mostramos un toast de éxito
+      toast({
+        title: "Archivo procesado",
+        description: `Se procesaron ${logs.length} registros de logs.`,
+      });
+    } catch (error) {
+      console.error("Error al procesar el archivo:", error);
+      toast({
+        title: "Error",
+        description: "Error al procesar el archivo CSV.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -66,6 +104,9 @@ const FileUpload = () => {
           <h3 className="text-lg font-semibold mb-1">Cargar archivo CSV</h3>
           <p className="text-sm text-muted-foreground mb-4">
             Arrastra y suelta tu archivo aquí o haz clic para seleccionarlo
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Formato esperado: timestamp,type,source,message,severity
           </p>
         </div>
         <label htmlFor="file-upload">
