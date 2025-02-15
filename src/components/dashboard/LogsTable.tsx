@@ -13,24 +13,12 @@ interface LogEntry {
   severity: string;
 }
 
-const LogsTable = () => {
+interface LogsTableProps {
+  logs: LogEntry[];
+}
+
+const LogsTable = ({ logs }: LogsTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [logs] = useState<LogEntry[]>([
-    {
-      timestamp: "2024-03-20 10:15:23",
-      type: "AUTH",
-      source: "192.168.1.100",
-      message: "Failed login attempt",
-      severity: "Alto"
-    },
-    {
-      timestamp: "2024-03-20 10:14:55",
-      type: "SYSTEM",
-      source: "firewall",
-      message: "Configuration updated",
-      severity: "Bajo"
-    }
-  ]);
 
   const filteredLogs = logs.filter(log => 
     Object.values(log).some(value => 

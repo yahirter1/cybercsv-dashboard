@@ -13,7 +13,11 @@ interface LogEntry {
   severity: string;
 }
 
-const FileUpload = () => {
+interface FileUploadProps {
+  onLogsUpdate: (logs: LogEntry[]) => void;
+}
+
+const FileUpload = ({ onLogsUpdate }: FileUploadProps) => {
   const { toast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
 
@@ -72,9 +76,8 @@ const FileUpload = () => {
     try {
       const logs = await parseCSV(csvFiles[0]);
       console.log("Logs procesados:", logs);
+      onLogsUpdate(logs);
       
-      // Aquí actualizaríamos el estado global con los logs
-      // Por ahora solo mostramos un toast de éxito
       toast({
         title: "Archivo procesado",
         description: `Se procesaron ${logs.length} registros de logs.`,
