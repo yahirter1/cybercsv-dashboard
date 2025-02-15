@@ -3,6 +3,7 @@ import { Shield, AlertTriangle, UserCheck, Activity } from "lucide-react";
 import MetricCard from "@/components/dashboard/MetricCard";
 import LogsTable from "@/components/dashboard/LogsTable";
 import Charts from "@/components/dashboard/Charts";
+import FileUpload from "@/components/dashboard/FileUpload";
 
 const Index = () => {
   return (
@@ -33,6 +34,10 @@ const Index = () => {
           value="98.5%"
           icon={<Activity className="h-8 w-8 text-success" />}
         />
+      </div>
+
+      <div className="mb-8">
+        <FileUpload />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
