@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, ScatterChart, Scatter, Rectangle, Legend } from 'recharts';
-import { format, parseISO, startOfWeek, getDay } from 'date-fns';
+import { format, parseISO, startOfWeek, getDay, subDays, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 interface LogEntry {
@@ -99,20 +99,37 @@ const Charts = ({ logs, type }: ChartsProps) => {
   };
 
   const prepareTrendsData = () => {
+    const dates = logs.map(log => parseISO(log.timestamp));
+    if (dates.length === 0) return [];
+    
+    const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+    const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
+    
     const timeData: { [key: string]: { date: string; alto: number; medio: number; bajo: number } } = {};
     
+    const dateRange = eachDayOfInterval({ start: minDate, end: maxDate });
+    dateRange.forEach(date => {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      timeData[dateStr] = { 
+        date: dateStr, 
+        alto: 0, 
+        medio: 0, 
+        bajo: 0 
+      };
+    });
+    
     logs.forEach(log => {
-      const date = format(parseISO(log.timestamp), 'yyyy-MM-dd', { locale: es });
-      if (!timeData[date]) {
-        timeData[date] = { date, alto: 0, medio: 0, bajo: 0 };
-      }
+      const date = format(parseISO(log.timestamp), 'yyyy-MM-dd');
       const severity = log.severity.toLowerCase();
       if (severity === 'alto' || severity === 'medio' || severity === 'bajo') {
-        timeData[date][severity]++;
+        if (timeData[date]) {
+          timeData[date][severity]++;
+        }
       }
     });
     
-    return Object.values(timeData).sort((a, b) => a.date.localeCompare(b.date));
+    return Object.values(timeData)
+      .sort((a, b) => a.date.localeCompare(b.date));
   };
 
   const getHeatmapColor = (value: number) => {
@@ -289,6 +306,7 @@ const Charts = ({ logs, type }: ChartsProps) => {
             <XAxis 
               dataKey="date" 
               tickFormatter={(date) => format(parseISO(date), 'dd MMM', { locale: es })}
+              minTickGap={50}
             />
             <YAxis />
             <Tooltip
@@ -305,25 +323,31 @@ const Charts = ({ logs, type }: ChartsProps) => {
               type="monotone" 
               dataKey="alto" 
               stroke={SEVERITY_COLORS.alto}
-              name="Alta"
+              name="Severidad Alta"
               strokeWidth={2}
-              dot={{ fill: SEVERITY_COLORS.alto }}
+              dot={{ fill: SEVERITY_COLORS.alto, r: 4 }}
+              activeDot={{ r: 6 }}
+              isAnimationActive={true}
             />
             <Line 
               type="monotone" 
               dataKey="medio" 
               stroke={SEVERITY_COLORS.medio}
-              name="Media"
+              name="Severidad Media"
               strokeWidth={2}
-              dot={{ fill: SEVERITY_COLORS.medio }}
+              dot={{ fill: SEVERITY_COLORS.medio, r: 4 }}
+              activeDot={{ r: 6 }}
+              isAnimationActive={true}
             />
             <Line 
               type="monotone" 
               dataKey="bajo" 
               stroke={SEVERITY_COLORS.bajo}
-              name="Baja"
+              name="Severidad Baja"
               strokeWidth={2}
-              dot={{ fill: SEVERITY_COLORS.bajo }}
+              dot={{ fill: SEVERITY_COLORS.bajo, r: 4 }}
+              activeDot={{ r: 6 }}
+              isAnimationActive={true}
             />
           </LineChart>
         </ResponsiveContainer>
