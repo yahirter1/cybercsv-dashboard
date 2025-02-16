@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, ScatterChart, Scatter, Rectangle } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, ScatterChart, Scatter, Rectangle, Legend } from 'recharts';
 import { format, parseISO, startOfWeek, getDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -13,7 +13,7 @@ interface LogEntry {
 
 interface ChartsProps {
   logs: LogEntry[];
-  type: 'severity' | 'events' | 'timeline' | 'heatmap';
+  type: 'severity' | 'events' | 'timeline' | 'heatmap' | 'trends';
 }
 
 const SEVERITY_COLORS = {
@@ -96,6 +96,23 @@ const Charts = ({ logs, type }: ChartsProps) => {
     }
 
     return heatmapData;
+  };
+
+  const prepareTrendsData = () => {
+    const timeData: { [key: string]: { date: string; alto: number; medio: number; bajo: number } } = {};
+    
+    logs.forEach(log => {
+      const date = format(parseISO(log.timestamp), 'yyyy-MM-dd', { locale: es });
+      if (!timeData[date]) {
+        timeData[date] = { date, alto: 0, medio: 0, bajo: 0 };
+      }
+      const severity = log.severity.toLowerCase();
+      if (severity === 'alto' || severity === 'medio' || severity === 'bajo') {
+        timeData[date][severity]++;
+      }
+    });
+    
+    return Object.values(timeData).sort((a, b) => a.date.localeCompare(b.date));
   };
 
   const getHeatmapColor = (value: number) => {
@@ -263,6 +280,57 @@ const Charts = ({ logs, type }: ChartsProps) => {
     );
   };
 
+  const renderTrendsChart = () => (
+    <Card className="p-6 animate-fade-up">
+      <h2 className="text-lg font-heading font-semibold mb-6">Tendencias por Severidad</h2>
+      <div className="h-[300px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={prepareTrendsData()}>
+            <XAxis 
+              dataKey="date" 
+              tickFormatter={(date) => format(parseISO(date), 'dd MMM', { locale: es })}
+            />
+            <YAxis />
+            <Tooltip
+              labelFormatter={(date) => format(parseISO(date as string), 'dd MMM yyyy', { locale: es })}
+              contentStyle={{ 
+                background: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+              }}
+            />
+            <Legend />
+            <Line 
+              type="monotone" 
+              dataKey="alto" 
+              stroke={SEVERITY_COLORS.alto}
+              name="Alta"
+              strokeWidth={2}
+              dot={{ fill: SEVERITY_COLORS.alto }}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="medio" 
+              stroke={SEVERITY_COLORS.medio}
+              name="Media"
+              strokeWidth={2}
+              dot={{ fill: SEVERITY_COLORS.medio }}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="bajo" 
+              stroke={SEVERITY_COLORS.bajo}
+              name="Baja"
+              strokeWidth={2}
+              dot={{ fill: SEVERITY_COLORS.bajo }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
+
   switch (type) {
     case 'severity':
       return renderSeverityPieChart();
@@ -272,6 +340,8 @@ const Charts = ({ logs, type }: ChartsProps) => {
       return renderTimelineChart();
     case 'heatmap':
       return renderHeatmapChart();
+    case 'trends':
+      return renderTrendsChart();
     default:
       return null;
   }
