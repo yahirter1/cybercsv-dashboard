@@ -112,12 +112,13 @@ const FileUpload = ({ onLogsUpdate }: FileUploadProps) => {
             Formato esperado: timestamp,type,source,message,severity
           </p>
         </div>
-        <label htmlFor="file-upload">
-          <Button>
-            <Upload className="mr-2 h-4 w-4" />
-            Seleccionar archivo
-          </Button>
-        </label>
+        <Button
+          onClick={() => document.getElementById('file-upload')?.click()}
+          className="cursor-pointer"
+        >
+          <Upload className="mr-2 h-4 w-4" />
+          Seleccionar archivo
+        </Button>
         <input
           id="file-upload"
           type="file"
