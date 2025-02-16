@@ -1,7 +1,6 @@
-
 import { Card } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { format, parseISO } from 'date-fns';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, ScatterChart, Scatter, Rectangle } from 'recharts';
+import { format, parseISO, startOfWeek, getDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 interface LogEntry {
@@ -14,7 +13,7 @@ interface LogEntry {
 
 interface ChartsProps {
   logs: LogEntry[];
-  type: 'severity' | 'events' | 'timeline';
+  type: 'severity' | 'events' | 'timeline' | 'heatmap';
 }
 
 const SEVERITY_COLORS = {
@@ -24,6 +23,14 @@ const SEVERITY_COLORS = {
 };
 
 const EVENT_COLORS = ['#9b87f5', '#7E69AB', '#6E59A5', '#F2FCE2', '#FEF7CD', '#FEC6A1'];
+
+const HEATMAP_COLORS = [
+  '#EBEDF0',  // Muy bajo
+  '#9BE9A8',  // Bajo
+  '#40C463',  // Medio
+  '#30A14E',  // Alto
+  '#216E39'   // Muy alto
+];
 
 const Charts = ({ logs, type }: ChartsProps) => {
   const prepareSeverityData = () => {
@@ -63,6 +70,42 @@ const Charts = ({ logs, type }: ChartsProps) => {
         count
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
+  };
+
+  const prepareHeatmapData = () => {
+    const heatmapData: { hour: number; day: number; value: number }[] = [];
+    const hourlyData: { [key: string]: number } = {};
+
+    logs.forEach(log => {
+      const date = parseISO(log.timestamp);
+      const hour = date.getHours();
+      const day = getDay(date);
+      const key = `${day}-${hour}`;
+      hourlyData[key] = (hourlyData[key] || 0) + 1;
+    });
+
+    for (let day = 0; day < 7; day++) {
+      for (let hour = 0; hour < 24; hour++) {
+        const key = `${day}-${hour}`;
+        heatmapData.push({
+          hour,
+          day,
+          value: hourlyData[key] || 0
+        });
+      }
+    }
+
+    return heatmapData;
+  };
+
+  const getHeatmapColor = (value: number) => {
+    const max = Math.max(...prepareHeatmapData().map(d => d.value));
+    const normalized = value / max;
+    const colorIndex = Math.min(
+      Math.floor(normalized * HEATMAP_COLORS.length),
+      HEATMAP_COLORS.length - 1
+    );
+    return HEATMAP_COLORS[colorIndex];
   };
 
   const renderSeverityPieChart = () => (
@@ -158,6 +201,65 @@ const Charts = ({ logs, type }: ChartsProps) => {
     </Card>
   );
 
+  const renderHeatmapChart = () => {
+    const data = prepareHeatmapData();
+    const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+    return (
+      <Card className="p-6 animate-fade-up">
+        <h2 className="text-lg font-heading font-semibold mb-6">Distribución por Hora y Día</h2>
+        <div className="h-[400px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <ScatterChart
+              margin={{ top: 20, right: 20, bottom: 20, left: 40 }}
+            >
+              <XAxis
+                type="number"
+                dataKey="hour"
+                domain={[0, 23]}
+                tickCount={24}
+                tickFormatter={(hour) => `${hour}h`}
+              />
+              <YAxis
+                type="number"
+                dataKey="day"
+                domain={[0, 6]}
+                tickCount={7}
+                tickFormatter={(day) => dayNames[day]}
+              />
+              <Tooltip
+                content={({ payload }) => {
+                  if (!payload || !payload[0]) return null;
+                  const data = payload[0].payload;
+                  return (
+                    <div className="bg-white p-2 rounded-lg shadow-lg border">
+                      <p className="font-medium">{`${dayNames[data.day]} ${data.hour}:00`}</p>
+                      <p className="text-sm">{`${data.value} eventos`}</p>
+                    </div>
+                  );
+                }}
+              />
+              <Scatter data={data}>
+                {data.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    shape={
+                      <Rectangle
+                        width={20}
+                        height={20}
+                        fill={getHeatmapColor(entry.value)}
+                      />
+                    }
+                  />
+                ))}
+              </Scatter>
+            </ScatterChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
+    );
+  };
+
   switch (type) {
     case 'severity':
       return renderSeverityPieChart();
@@ -165,6 +267,8 @@ const Charts = ({ logs, type }: ChartsProps) => {
       return renderEventTypeChart();
     case 'timeline':
       return renderTimelineChart();
+    case 'heatmap':
+      return renderHeatmapChart();
     default:
       return null;
   }
