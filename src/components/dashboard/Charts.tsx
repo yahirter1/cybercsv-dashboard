@@ -108,6 +108,19 @@ const Charts = ({ logs, type }: ChartsProps) => {
     return HEATMAP_COLORS[colorIndex];
   };
 
+  const CustomHeatmapCell = (props: any) => {
+    const { x, y, value } = props;
+    return (
+      <Rectangle
+        x={x}
+        y={y}
+        width={20}
+        height={20}
+        fill={getHeatmapColor(value)}
+      />
+    );
+  };
+
   const renderSeverityPieChart = () => (
     <Card className="p-6 animate-fade-up">
       <h2 className="text-lg font-heading font-semibold mb-6">Distribución por Severidad</h2>
@@ -239,20 +252,10 @@ const Charts = ({ logs, type }: ChartsProps) => {
                   );
                 }}
               />
-              <Scatter data={data}>
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    shape={
-                      <Rectangle
-                        width={20}
-                        height={20}
-                        fill={getHeatmapColor(entry.value)}
-                      />
-                    }
-                  />
-                ))}
-              </Scatter>
+              <Scatter
+                data={data}
+                shape={<CustomHeatmapCell />}
+              />
             </ScatterChart>
           </ResponsiveContainer>
         </div>
