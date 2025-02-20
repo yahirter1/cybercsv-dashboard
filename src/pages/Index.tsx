@@ -16,10 +16,17 @@ interface LogEntry {
 
 const Index = () => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleLogsUpdate = (newLogs: LogEntry[]) => {
     setLogs(newLogs);
   };
+
+  const filteredLogs = logs.filter(log => 
+    Object.values(log).some(value => 
+      value.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
 
   const calculateMetrics = () => {
     const now = new Date();
@@ -111,13 +118,13 @@ const Index = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <Charts logs={logs} type="severity" />
-        <Charts logs={logs} type="trends" />
-        <Charts logs={logs} type="timeline" />
-        <Charts logs={logs} type="heatmap" />
+        <Charts logs={filteredLogs} type="severity" />
+        <Charts logs={filteredLogs} type="trends" />
+        <Charts logs={filteredLogs} type="timeline" />
+        <Charts logs={filteredLogs} type="heatmap" />
       </div>
 
-      <LogsTable logs={logs} />
+      <LogsTable logs={filteredLogs} onSearch={setSearchTerm} searchTerm={searchTerm} />
     </div>
   );
 };

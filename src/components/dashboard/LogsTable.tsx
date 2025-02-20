@@ -3,7 +3,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { useState } from "react";
 
 interface LogEntry {
   timestamp: string;
@@ -15,17 +14,11 @@ interface LogEntry {
 
 interface LogsTableProps {
   logs: LogEntry[];
+  searchTerm: string;
+  onSearch: (term: string) => void;
 }
 
-const LogsTable = ({ logs }: LogsTableProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const filteredLogs = logs.filter(log => 
-    Object.values(log).some(value => 
-      value.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
-
+const LogsTable = ({ logs, searchTerm, onSearch }: LogsTableProps) => {
   return (
     <Card className="p-6 animate-fade-up">
       <div className="flex items-center justify-between mb-6">
@@ -36,7 +29,7 @@ const LogsTable = ({ logs }: LogsTableProps) => {
             placeholder="Buscar registros..."
             className="pl-10 w-[300px]"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => onSearch(e.target.value)}
           />
         </div>
       </div>
@@ -52,7 +45,7 @@ const LogsTable = ({ logs }: LogsTableProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredLogs.map((log, index) => (
+            {logs.map((log, index) => (
               <TableRow key={index}>
                 <TableCell>{log.timestamp}</TableCell>
                 <TableCell>{log.type}</TableCell>
@@ -60,9 +53,13 @@ const LogsTable = ({ logs }: LogsTableProps) => {
                 <TableCell>{log.message}</TableCell>
                 <TableCell>
                   <span className={`px-2 py-1 rounded-full ${
-                    log.severity.toLowerCase() === 'alto' 
+                    log.severity.toLowerCase() === 'critical' 
                       ? 'bg-danger/10 text-danger' 
-                      : 'bg-success/10 text-success'
+                      : log.severity.toLowerCase() === 'error'
+                      ? 'bg-error/10 text-error'
+                      : log.severity.toLowerCase() === 'warning'
+                      ? 'bg-warning/10 text-warning'
+                      : 'bg-info/10 text-info'
                   } text-sm`}>
                     {log.severity}
                   </span>
