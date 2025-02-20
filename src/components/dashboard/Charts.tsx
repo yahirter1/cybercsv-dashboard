@@ -17,9 +17,10 @@ interface ChartsProps {
 }
 
 const SEVERITY_COLORS = {
-  'alto': '#ea384c',    // Rojo para crítico
-  'medio': '#F97316',   // Naranja para warning
-  'bajo': '#0EA5E9'     // Azul para info
+  'critical': '#dc2626',    // Rojo intenso
+  'error': '#ef4444',       // Rojo
+  'warning': '#f59e0b',     // Amarillo
+  'info': '#3b82f6'         // Azul
 };
 
 const EVENT_COLORS = ['#9b87f5', '#7E69AB', '#6E59A5', '#F2FCE2', '#FEF7CD', '#FEC6A1'];
@@ -105,26 +106,31 @@ const Charts = ({ logs, type }: ChartsProps) => {
     const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
     const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
     
-    const timeData: { [key: string]: { date: string; alto: number; medio: number; bajo: number } } = {};
+    const timeData: { [key: string]: { 
+      date: string; 
+      critical: number; 
+      error: number; 
+      warning: number; 
+      info: number;
+    } } = {};
     
     const dateRange = eachDayOfInterval({ start: minDate, end: maxDate });
     dateRange.forEach(date => {
       const dateStr = format(date, 'yyyy-MM-dd');
       timeData[dateStr] = { 
         date: dateStr, 
-        alto: 0, 
-        medio: 0, 
-        bajo: 0 
+        critical: 0,
+        error: 0,
+        warning: 0,
+        info: 0
       };
     });
     
     logs.forEach(log => {
       const date = format(parseISO(log.timestamp), 'yyyy-MM-dd');
       const severity = log.severity.toLowerCase();
-      if (severity === 'alto' || severity === 'medio' || severity === 'bajo') {
-        if (timeData[date]) {
-          timeData[date][severity]++;
-        }
+      if (timeData[date] && ['critical', 'error', 'warning', 'info'].includes(severity)) {
+        timeData[date][severity as keyof typeof SEVERITY_COLORS]++;
       }
     });
     
@@ -321,31 +327,41 @@ const Charts = ({ logs, type }: ChartsProps) => {
             <Legend />
             <Line 
               type="monotone" 
-              dataKey="alto" 
-              stroke={SEVERITY_COLORS.alto}
-              name="Severidad Alta"
+              dataKey="critical" 
+              stroke={SEVERITY_COLORS.critical}
+              name="Critical"
               strokeWidth={2}
-              dot={{ fill: SEVERITY_COLORS.alto, r: 4 }}
+              dot={{ fill: SEVERITY_COLORS.critical, r: 4 }}
               activeDot={{ r: 6 }}
               isAnimationActive={true}
             />
             <Line 
               type="monotone" 
-              dataKey="medio" 
-              stroke={SEVERITY_COLORS.medio}
-              name="Severidad Media"
+              dataKey="error" 
+              stroke={SEVERITY_COLORS.error}
+              name="Error"
               strokeWidth={2}
-              dot={{ fill: SEVERITY_COLORS.medio, r: 4 }}
+              dot={{ fill: SEVERITY_COLORS.error, r: 4 }}
               activeDot={{ r: 6 }}
               isAnimationActive={true}
             />
             <Line 
               type="monotone" 
-              dataKey="bajo" 
-              stroke={SEVERITY_COLORS.bajo}
-              name="Severidad Baja"
+              dataKey="warning" 
+              stroke={SEVERITY_COLORS.warning}
+              name="Warning"
               strokeWidth={2}
-              dot={{ fill: SEVERITY_COLORS.bajo, r: 4 }}
+              dot={{ fill: SEVERITY_COLORS.warning, r: 4 }}
+              activeDot={{ r: 6 }}
+              isAnimationActive={true}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="info" 
+              stroke={SEVERITY_COLORS.info}
+              name="Info"
+              strokeWidth={2}
+              dot={{ fill: SEVERITY_COLORS.info, r: 4 }}
               activeDot={{ r: 6 }}
               isAnimationActive={true}
             />
