@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, ScatterChart, Scatter, Rectangle, Legend } from 'recharts';
 import { format, parseISO, startOfWeek, getDay, subDays, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
+import ExportButtons from './ExportButtons';
 
 interface LogEntry {
   timestamp: string;
@@ -163,8 +164,11 @@ const Charts = ({ logs, type }: ChartsProps) => {
 
   const renderSeverityPieChart = () => (
     <Card className="p-6 animate-fade-up">
-      <h2 className="text-lg font-heading font-semibold mb-6">Distribución por Severidad</h2>
-      <div className="h-[300px] w-full">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-lg font-heading font-semibold">Distribución por Severidad</h2>
+        <ExportButtons containerId="severity-chart" fileName="distribucion-severidad" />
+      </div>
+      <div id="severity-chart" className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -192,8 +196,11 @@ const Charts = ({ logs, type }: ChartsProps) => {
 
   const renderEventTypeChart = () => (
     <Card className="p-6 animate-fade-up">
-      <h2 className="text-lg font-heading font-semibold mb-6">Tipos de Eventos</h2>
-      <div className="h-[300px] w-full">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-lg font-heading font-semibold">Tipos de Eventos</h2>
+        <ExportButtons containerId="events-chart" fileName="tipos-eventos" />
+      </div>
+      <div id="events-chart" className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={prepareEventTypeData()}>
             <XAxis dataKey="name" />
@@ -223,8 +230,11 @@ const Charts = ({ logs, type }: ChartsProps) => {
 
   const renderTimelineChart = () => (
     <Card className="p-6 animate-fade-up">
-      <h2 className="text-lg font-heading font-semibold mb-6">Línea de Tiempo de Eventos</h2>
-      <div className="h-[300px] w-full">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-lg font-heading font-semibold">Línea de Tiempo de Eventos</h2>
+        <ExportButtons containerId="timeline-chart" fileName="linea-tiempo" />
+      </div>
+      <div id="timeline-chart" className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={prepareTimelineData()}>
             <XAxis 
@@ -260,8 +270,11 @@ const Charts = ({ logs, type }: ChartsProps) => {
 
     return (
       <Card className="p-6 animate-fade-up">
-        <h2 className="text-lg font-heading font-semibold mb-6">Distribución por Hora y Día</h2>
-        <div className="h-[400px] w-full">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-heading font-semibold">Distribución por Hora y Día</h2>
+          <ExportButtons containerId="heatmap-chart" fileName="distribucion-horaria" />
+        </div>
+        <div id="heatmap-chart" className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <ScatterChart
               margin={{ top: 20, right: 20, bottom: 20, left: 40 }}
@@ -305,8 +318,11 @@ const Charts = ({ logs, type }: ChartsProps) => {
 
   const renderTrendsChart = () => (
     <Card className="p-6 animate-fade-up">
-      <h2 className="text-lg font-heading font-semibold mb-6">Tendencias por Severidad</h2>
-      <div className="h-[300px] w-full">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-lg font-heading font-semibold">Tendencias por Severidad</h2>
+        <ExportButtons containerId="trends-chart" fileName="tendencias-severidad" />
+      </div>
+      <div id="trends-chart" className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={prepareTrendsData()}>
             <XAxis 
