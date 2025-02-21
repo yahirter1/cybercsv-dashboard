@@ -165,36 +165,49 @@ const Charts = ({ logs, type }: ChartsProps) => {
     );
   };
 
-  const renderSeverityPieChart = () => (
-    <Card className="p-6 animate-fade-up">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-heading font-semibold">Distribución por Severidad</h2>
-      </div>
-      <div id="severity-chart" className="h-[300px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={prepareSeverityData()}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-            >
-              {prepareSeverityData().map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={SEVERITY_COLORS[entry.name.toLowerCase()] || EVENT_COLORS[index % EVENT_COLORS.length]} 
-                />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-    </Card>
-  );
+  const renderSeverityPieChart = () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const severityFilter = searchParams.get('severity')?.toLowerCase();
+
+    return (
+      <Card className="p-6 animate-fade-up">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-heading font-semibold">Distribución por Severidad</h2>
+        </div>
+        <div id="severity-chart" className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={prepareSeverityData()}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              >
+                {prepareSeverityData().map((entry, index) => {
+                  const isHighlighted = severityFilter ? 
+                    entry.name.toLowerCase() === severityFilter : 
+                    false;
+                  
+                  return (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={SEVERITY_COLORS[entry.name.toLowerCase()] || EVENT_COLORS[index % EVENT_COLORS.length]}
+                      opacity={severityFilter ? (isHighlighted ? 1 : 0.3) : 1}
+                      className="transition-opacity duration-200"
+                    />
+                  );
+                })}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
+    );
+  };
 
   const renderEventTypeChart = () => (
     <Card className="p-6 animate-fade-up">
@@ -293,7 +306,7 @@ const Charts = ({ logs, type }: ChartsProps) => {
               dataKey="day"
               domain={[0, 6]}
               tickCount={7}
-              tickFormatter={(day) => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][day]}
+              tickFormatter={(day) => ['Dom', 'Lun', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][day]}
               fontSize={12}
               width={50}
             />
