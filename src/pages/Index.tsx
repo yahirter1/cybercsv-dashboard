@@ -59,82 +59,91 @@ const Index = () => {
   const metrics = calculateMetrics();
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="flex justify-between items-center mb-8">
-        <header>
-          <h1 className="text-3xl font-heading font-bold text-primary mb-2">Dashboard de Seguridad</h1>
-          <p className="text-muted-foreground">Monitoreo y análisis de logs de seguridad en tiempo real</p>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-8 mb-6 sm:mb-8">
+        <header className="w-full sm:w-auto">
+          <h1 className="text-2xl sm:text-3xl font-heading font-bold text-primary mb-2">Dashboard de Seguridad</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Monitoreo y análisis de logs de seguridad en tiempo real</p>
         </header>
-        <ExportButtons />
+        <div className="w-full sm:w-auto">
+          <ExportButtons />
+        </div>
       </div>
 
-      <div id="security-dashboard" className="space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div id="security-dashboard" className="space-y-6 sm:space-y-8">
+        {/* Métricas principales */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           <MetricCard
             title="Alertas Totales"
             value={metrics.totalAlerts.toString()}
             subtitle={`${metrics.alertsLastHour} en la última hora`}
-            icon={<Shield className="h-8 w-8 text-success" />}
+            icon={<Shield className="h-6 w-6 sm:h-8 sm:w-8 text-success" />}
           />
           <MetricCard
             title="Incidentes Críticos"
             value={`${metrics.criticalIncidents}`}
             subtitle={`${metrics.criticalPercentage}% del total`}
-            icon={<AlertTriangle className="h-8 w-8 text-danger" />}
+            icon={<AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-danger" />}
           />
           <MetricCard
             title="Sistemas Afectados"
             value={metrics.systemsAffected.toString()}
             subtitle="Fuentes únicas detectadas"
-            icon={<Server className="h-8 w-8 text-primary" />}
+            icon={<Server className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />}
           />
           <MetricCard
             title="Tiempo de Respuesta"
             value={metrics.responseRate}
             subtitle="Tasa de detección efectiva"
-            icon={<Zap className="h-8 w-8 text-warning" />}
+            icon={<Zap className="h-6 w-6 sm:h-8 sm:w-8 text-warning" />}
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Métricas secundarias */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           <MetricCard
             title="Promedio por Hora"
             value={metrics.averageAlertsPerHour.toString()}
             subtitle="Alertas/hora"
-            icon={<Clock className="h-8 w-8 text-info" />}
+            icon={<Clock className="h-6 w-6 sm:h-8 sm:w-8 text-info" />}
           />
           <MetricCard
             title="Severidad Alta"
             value={metrics.warningPercentage + "%"}
             subtitle="Del total de alertas"
-            icon={<AlertOctagon className="h-8 w-8 text-danger" />}
+            icon={<AlertOctagon className="h-6 w-6 sm:h-8 sm:w-8 text-danger" />}
           />
           <MetricCard
             title="Fuentes Activas"
             value={metrics.uniqueSources.toString()}
             subtitle="Sistemas monitoreados"
-            icon={<UserCheck className="h-8 w-8 text-success" />}
+            icon={<UserCheck className="h-6 w-6 sm:h-8 sm:w-8 text-success" />}
           />
           <MetricCard
             title="Eficiencia"
             value={metrics.responseRate}
             subtitle="Tasa de procesamiento"
-            icon={<Activity className="h-8 w-8 text-success" />}
+            icon={<Activity className="h-6 w-6 sm:h-8 sm:w-8 text-success" />}
           />
         </div>
 
-        <div>
+        {/* Sección de carga de archivos */}
+        <div className="w-full">
           <FileUpload onLogsUpdate={handleLogsUpdate} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Gráficos */}
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <Charts logs={filteredLogs} type="severity" />
           <Charts logs={filteredLogs} type="trends" />
           <Charts logs={filteredLogs} type="timeline" />
           <Charts logs={filteredLogs} type="heatmap" />
         </div>
 
-        <LogsTable logs={filteredLogs} onSearch={setSearchTerm} searchTerm={searchTerm} />
+        {/* Tabla de logs */}
+        <div className="w-full overflow-x-auto">
+          <LogsTable logs={filteredLogs} onSearch={setSearchTerm} searchTerm={searchTerm} />
+        </div>
       </div>
     </div>
   );
