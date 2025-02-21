@@ -33,19 +33,24 @@ const Index = () => {
     const now = new Date();
     const lastHourLogs = logs.filter(log => {
       const logDate = new Date(log.timestamp);
-      return (now.getTime() - logDate.getTime()) <= 3600000; // 1 hora en milisegundos
+      return (now.getTime() - logDate.getTime()) <= 3600000;
     });
 
-    const criticalIncidents = logs.filter(log => log.severity.toLowerCase() === 'alto');
+    const criticalLogs = logs.filter(log => log.severity.toLowerCase() === 'critical');
+    const warningLogs = logs.filter(log => log.severity.toLowerCase() === 'warning');
     const uniqueSources = new Set(logs.map(log => log.source));
+    
+    const criticalPercentage = logs.length > 0 ? (criticalLogs.length / logs.length) * 100 : 0;
+    const warningPercentage = logs.length > 0 ? (warningLogs.length / logs.length) * 100 : 0;
     
     return {
       totalAlerts: logs.length,
-      criticalIncidents: criticalIncidents.length,
+      criticalIncidents: criticalLogs.length,
       alertsLastHour: lastHourLogs.length,
       uniqueSources: uniqueSources.size,
       averageAlertsPerHour: logs.length > 0 ? Math.round(logs.length / 24) : 0,
-      criticalPercentage: logs.length > 0 ? Math.round((criticalIncidents.length / logs.length) * 100) : 0,
+      criticalPercentage: criticalPercentage.toFixed(1),
+      warningPercentage: warningPercentage.toFixed(1),
       systemsAffected: uniqueSources.size,
       responseRate: logs.length > 0 ? "98.5%" : "0%"
     };
@@ -73,7 +78,7 @@ const Index = () => {
           />
           <MetricCard
             title="Incidentes Críticos"
-            value={metrics.criticalIncidents.toString()}
+            value={`${metrics.criticalIncidents}`}
             subtitle={`${metrics.criticalPercentage}% del total`}
             icon={<AlertTriangle className="h-8 w-8 text-danger" />}
           />
@@ -100,7 +105,7 @@ const Index = () => {
           />
           <MetricCard
             title="Severidad Alta"
-            value={`${metrics.criticalPercentage}%`}
+            value={metrics.warningPercentage + "%"}
             subtitle="Del total de alertas"
             icon={<AlertOctagon className="h-8 w-8 text-danger" />}
           />
