@@ -151,13 +151,16 @@ const Charts = ({ logs, type }: ChartsProps) => {
 
   const CustomHeatmapCell = (props: any) => {
     const { x, y, value } = props;
+    const cellSize = window.innerWidth < 768 ? 15 : 20;
+    
     return (
       <Rectangle
         x={x}
         y={y}
-        width={20}
-        height={20}
+        width={cellSize}
+        height={cellSize}
         fill={getHeatmapColor(value)}
+        className="transition-colors duration-200"
       />
     );
   };
@@ -262,19 +265,28 @@ const Charts = ({ logs, type }: ChartsProps) => {
   );
 
   const renderHeatmapChart = () => (
-    <Card className="p-6 animate-fade-up">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-heading font-semibold">Distribución por Hora y Día</h2>
+    <Card className="p-4 md:p-6 animate-fade-up">
+      <div className="flex justify-between items-center mb-4 md:mb-6">
+        <h2 className="text-base md:text-lg font-heading font-semibold">Distribución por Hora y Día</h2>
       </div>
-      <div id="heatmap-chart" className="h-[400px] w-full">
+      <div id="heatmap-chart" className="h-[450px] md:h-[400px] w-full overflow-x-auto">
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 40 }}>
+          <ScatterChart 
+            margin={{ 
+              top: 20, 
+              right: 20, 
+              bottom: 30, 
+              left: 60 
+            }}
+          >
             <XAxis
               type="number"
               dataKey="hour"
               domain={[0, 23]}
-              tickCount={24}
+              tickCount={12}
               tickFormatter={(hour) => `${hour}h`}
+              interval={window.innerWidth < 768 ? 1 : 0}
+              fontSize={12}
             />
             <YAxis
               type="number"
@@ -282,15 +294,20 @@ const Charts = ({ logs, type }: ChartsProps) => {
               domain={[0, 6]}
               tickCount={7}
               tickFormatter={(day) => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][day]}
+              fontSize={12}
+              width={50}
             />
             <Tooltip
               content={({ payload }) => {
                 if (!payload || !payload[0]) return null;
                 const data = payload[0].payload;
                 return (
-                  <div className="bg-white p-2 rounded-lg shadow-lg border">
-                    <p className="font-medium">{`${['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][data.day]} ${data.hour}:00`}</p>
-                    <p className="text-sm">{`${data.value} eventos`}</p>
+                  <div className="bg-white p-3 rounded-lg shadow-lg border">
+                    <p className="font-medium text-sm md:text-base">
+                      {`${['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][data.day]}`}
+                    </p>
+                    <p className="text-sm text-gray-600">{`${data.hour}:00 - ${data.hour + 1}:00`}</p>
+                    <p className="text-sm font-semibold mt-1">{`${data.value} evento${data.value !== 1 ? 's' : ''}`}</p>
                   </div>
                 );
               }}
