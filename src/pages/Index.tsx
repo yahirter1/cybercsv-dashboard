@@ -72,9 +72,6 @@ const Index = () => {
       </div>
 
       <div id="security-dashboard" className="space-y-6 sm:space-y-8">
-        {/* Nueva sección de filtros */}
-        <FilterSection onSearch={setSearchTerm} searchTerm={searchTerm} />
-
         {/* Métricas principales */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           <MetricCard
@@ -143,6 +140,9 @@ const Index = () => {
           <Charts logs={filteredLogs} type="timeline" />
           <Charts logs={filteredLogs} type="heatmap" />
         </div>
+
+        {/* Sección de filtros */}
+        <FilterSection onSearch={setSearchTerm} searchTerm={searchTerm} />
 
         {/* Tabla de logs */}
         <div className="w-full overflow-x-auto">
