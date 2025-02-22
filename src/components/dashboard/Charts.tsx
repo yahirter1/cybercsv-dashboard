@@ -152,13 +152,14 @@ const Charts = ({ logs, type }: ChartsProps) => {
   const CustomHeatmapCell = (props: any) => {
     const { x, y, value } = props;
     const cellSize = window.innerWidth < 768 ? 15 : 20;
+    const cellHeight = window.innerWidth < 768 ? 10 : 12;
     
     return (
       <Rectangle
         x={x}
         y={y}
         width={cellSize}
-        height={cellSize}
+        height={cellHeight}
         fill={getHeatmapColor(value)}
         className="transition-colors duration-200"
       />
@@ -282,7 +283,7 @@ const Charts = ({ logs, type }: ChartsProps) => {
       <div className="flex justify-between items-center mb-4 md:mb-6">
         <h2 className="text-base md:text-lg font-heading font-semibold">Distribución por Hora y Día</h2>
       </div>
-      <div id="heatmap-chart" className="h-[450px] md:h-[400px] w-full overflow-x-auto">
+      <div id="heatmap-chart" className="h-[300px] md:h-[350px] w-full overflow-x-auto">
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart 
             margin={{ 
@@ -306,7 +307,7 @@ const Charts = ({ logs, type }: ChartsProps) => {
               dataKey="day"
               domain={[0, 6]}
               tickCount={7}
-              tickFormatter={(day) => ['Dom', 'Lun', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][day]}
+              tickFormatter={(day) => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][day]}
               fontSize={12}
               width={50}
             />
