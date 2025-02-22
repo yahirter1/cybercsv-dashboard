@@ -142,7 +142,11 @@ const Index = () => {
         </div>
 
         {/* Sección de filtros */}
-        <FilterSection onSearch={setSearchTerm} searchTerm={searchTerm} />
+        <FilterSection 
+          onSearch={setSearchTerm} 
+          searchTerm={searchTerm} 
+          logs={logs}
+        />
 
         {/* Tabla de logs */}
         <div className="w-full overflow-x-auto">
