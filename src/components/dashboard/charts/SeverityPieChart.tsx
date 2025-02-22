@@ -1,7 +1,7 @@
 
 import { Card } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { SEVERITY_COLORS } from "@/utils/chartUtils";
+import { SEVERITY_COLORS, EVENT_COLORS } from "@/utils/chartUtils";
 import type { LogEntry } from "@/utils/chartUtils";
 
 interface SeverityPieChartProps {
