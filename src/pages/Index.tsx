@@ -1,11 +1,13 @@
 
-import { Shield, AlertTriangle, UserCheck, Activity, Clock, Server, AlertOctagon, Zap } from "lucide-react";
+import { Shield, AlertTriangle, UserCheck, Activity, Clock, Server, AlertOctagon, Zap, Moon, Sun } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import MetricCard from "@/components/dashboard/MetricCard";
 import LogsTable from "@/components/dashboard/LogsTable";
 import Charts from "@/components/dashboard/Charts";
 import FileUpload from "@/components/dashboard/FileUpload";
 import ExportButtons from "@/components/dashboard/ExportButtons";
 import FilterSection from "@/components/dashboard/FilterSection";
+import { useTheme } from "@/components/theme-provider";
 import { useState } from "react";
 
 interface LogEntry {
@@ -19,6 +21,7 @@ interface LogEntry {
 const Index = () => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const { theme, setTheme } = useTheme();
 
   const handleLogsUpdate = (newLogs: LogEntry[]) => {
     setLogs(newLogs);
@@ -60,13 +63,24 @@ const Index = () => {
   const metrics = calculateMetrics();
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-8 mb-6 sm:mb-8">
         <header className="w-full sm:w-auto">
           <h1 className="text-2xl sm:text-3xl font-heading font-bold text-primary mb-2">Dashboard de Seguridad</h1>
           <p className="text-sm sm:text-base text-muted-foreground">Monitoreo y análisis de logs de seguridad en tiempo real</p>
         </header>
-        <div className="w-full sm:w-auto">
+        <div className="flex gap-4 items-center">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+          >
+            {theme === "light" ? (
+              <Moon className="h-5 w-5" />
+            ) : (
+              <Sun className="h-5 w-5" />
+            )}
+          </Button>
           <ExportButtons />
         </div>
       </div>
