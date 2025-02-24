@@ -24,6 +24,11 @@ interface FilterSectionProps {
 const FilterSection = ({ onSearch, searchTerm, logs = [] }: FilterSectionProps) => {
   const [date, setDate] = useState<Date>();
 
+  const handleClearFilters = () => {
+    setDate(undefined);
+    onSearch('');
+  };
+
   const exportFilteredLogsToCSV = () => {
     if (logs.length === 0) return;
 
@@ -79,13 +84,13 @@ const FilterSection = ({ onSearch, searchTerm, logs = [] }: FilterSectionProps) 
                   {date ? format(date, 'dd/MM/yyyy', { locale: es }) : 'Seleccionar fecha'}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto p-0 bg-white border rounded-md shadow-md">
                 <Calendar
                   mode="single"
                   selected={date}
                   onSelect={setDate}
                   locale={es}
-                  className="rounded-md border"
+                  className="rounded-md border bg-white"
                 />
               </PopoverContent>
             </Popover>
@@ -93,7 +98,7 @@ const FilterSection = ({ onSearch, searchTerm, logs = [] }: FilterSectionProps) 
               variant="outline"
               size="sm"
               className="flex items-center gap-2"
-              onClick={() => setDate(undefined)}
+              onClick={handleClearFilters}
             >
               <Filter className="h-4 w-4" />
               Limpiar
