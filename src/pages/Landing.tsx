@@ -1,7 +1,7 @@
-
 import { Button } from "@/components/ui/button";
 import { Shield, LineChart, Lock, Activity } from "lucide-react";
 import { Link } from "react-router-dom";
+import RegistroForm from "@/components/RegistroForm";
 
 const Landing = () => {
   return (
@@ -31,12 +31,7 @@ const Landing = () => {
               </div>
             </div>
             <div className="relative">
-              <img
-                src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&q=80"
-                alt="Dashboard Interface"
-                className="rounded-lg shadow-2xl"
-              />
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent rounded-lg"></div>
+              <RegistroForm />
             </div>
           </div>
         </div>
